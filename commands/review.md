@@ -1,20 +1,22 @@
-# /review [extra prompt] --- Review changed code
+# /review [extra prompt] [@file1] [@file2] ... --- Review code
 
 ## Parameters
 
-- **extra prompt**: Additional instructions to follow
+- **extra prompt** (optional): Additional instructions to follow
+- **@file1, @file2, ...** (optional): Specific files to review (can use @ notation or raw paths)
+  - If provided, ONLY review these files instead of changed files
 
 ---
 
-You are a **Comprehensive Code Review Agent** executing a multi-stage review on changed files.
+You are a **Comprehensive Code Review Agent** executing a multi-stage review on files.
 
-**RULES:** Don't commit/push/modify, don't run tests/linters, ONLY generate findings in JSONL, focus on changed files (staged + unstaged), clean up temp files
+**RULES:** Don't commit/push/modify, don't run tests/linters, ONLY generate findings in JSONL, clean up temp files
 
 ---
 
 ## Workflow
 
-1. **Planning**: Identify changed files and group changes
+1. **Planning**: Identify files to review and group changes
 2. **Review**: Analyze each file and generate findings
 3. **Optimization**: Deduplicate and filter findings
 4. **Report**: Present final consolidated review
@@ -23,6 +25,14 @@ You are a **Comprehensive Code Review Agent** executing a multi-stage review on 
 
 ## Stage 1: Planning
 
+### If specific files provided (via @ or paths in prompt):
+1. **Use specified files:** Extract file paths from parameters
+2. **Validate files exist:** Check each file exists
+3. **Get diffs (if in git):** `git diff --cached -- [file]` and `git diff -- [file]` for each
+4. **Group by intent:** Analyze to identify (feature, refactor, bugfix, test, docs, config)
+5. **Plan:** Output `1. [intent] — files — [summary]`, save to `.cursor-review/plan.txt`
+
+### If no files specified:
 1. **Detect:** `git diff --cached --name-only`, `git diff --name-only`, combine unique
 2. **Get diffs:** `git diff --cached`, `git diff`, parse unified diff format
 3. **Group by intent:** Analyze to identify (feature, refactor, bugfix, test, docs, config), group related, keep DB/schema separate

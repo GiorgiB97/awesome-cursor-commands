@@ -31,7 +31,7 @@ These commands provide a complete development workflow:
 - `/debug` - Systematic debugging and issue resolution
 
 **Documentation & Tools:**
-- `/doc` - Generate comprehensive documentation
+- `/doc` - Add inline documentation directly to files
 - `/description` - Generate PR descriptions from git diff
 - `/clean` - Clean up temporary command files
 
@@ -69,8 +69,10 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 
 ---
 
-### `/review [extra prompt]`
-**Comprehensive code review of staged/unstaged changes with JSONL findings.**
+### `/review [extra prompt] [@file1] [@file2] ...`
+**Comprehensive code review with JSONL findings.**
+
+**Target:** Changed files (default) OR specific files with @ notation
 
 **Severity:** 🔴 blocker | 🟠 major | 🟡 minor | 🔵 nit
 
@@ -78,8 +80,9 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 
 **Examples:**
 ```bash
-/review
-/review Focus on security issues
+/review                              # Review changed files
+/review Focus on security issues     # Review changed with focus
+/review @src/auth.ts @src/user.ts   # Review specific files
 ```
 
 ---
@@ -167,15 +170,18 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 
 ---
 
-### `/doc [extra prompt]`
-**Generate comprehensive documentation for changed code.**
+### `/doc [extra prompt] [@file1] [@file2] ...`
+**Add inline documentation directly to source files.**
 
-**Generates:** JSDoc/TSDoc, Python docstrings, GoDoc, README sections, API docs
+**Target:** Changed files (default) OR specific files with @ notation
+
+**Generates:** JSDoc/TSDoc, Python docstrings, GoDoc (written into files)
 
 **Examples:**
 ```bash
-/doc
-/doc Focus on public API documentation
+/doc                                 # Document changed files
+/doc Focus on public API             # Document changed with focus
+/doc @src/utils.ts @src/api.ts      # Document specific files
 ```
 
 ---
@@ -198,7 +204,7 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 ### `/clean`
 **Clean up temporary directories created by commands.**
 
-**Removes:** `.cursor-review/`, `.cursor-a11y/`, `.cursor-refactor/`, `.cursor-tests/`, `.cursor-doc/`
+**Removes:** `.cursor-review/`, `.cursor-a11y/`, `.cursor-refactor/`, `.cursor-tests/`
 
 **Example:**
 ```bash
@@ -227,7 +233,7 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 # 5. Check accessibility
 /a11y
 
-# 6. Generate documentation
+# 6. Add inline documentation
 /doc
 
 # 7. Create PR description
@@ -350,7 +356,8 @@ git commit -m "refactor: improve code quality"
 | `/a11y` | `.cursor-a11y/` | Accessibility audit data |
 | `/refactor` | `.cursor-refactor/` | Refactoring logs |
 | `/tests` | `.cursor-tests/` | Test generation data |
-| `/doc` | `.cursor-doc/` | Documentation drafts |
+
+**Note:** `/doc` writes directly into source files (no temp directory)
 
 **Clean up all:** `/clean`
 

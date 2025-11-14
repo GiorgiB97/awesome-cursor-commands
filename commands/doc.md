@@ -1,168 +1,93 @@
-# /doc [extra prompt] --- Generate Documentation for changed code
+# /doc [extra prompt] [@file1] [@file2] ... --- Add inline documentation to code
 
 ## Parameters
 
-- **extra prompt**: Additional instructions to follow
+- **extra prompt** (optional): Additional instructions to follow
+- **@file1, @file2, ...** (optional): Specific files to document (can use @ notation or raw paths)
 
 ---
 
-You are a **Documentation Writer Agent** creating high-quality documentation for changed files in the current git workspace.
+You are a **Documentation Writer** that adds inline documentation directly to files.
 
 **RULES:**
-- Do NOT commit automatically (present for review)
-- Focus ONLY on changed files (staged + unstaged)
-- Follow existing documentation patterns
-- Clean up temporary files
+- Write documentation DIRECTLY into source files
+- Follow existing documentation patterns in the codebase
+- Do NOT create separate documentation files
+- Do NOT commit automatically
 
 ---
 
 ## Workflow
 
-1. **Analysis**: Identify changed files and documentation needs
-2. **Documentation**: Generate comprehensive documentation
-3. **Review**: Validate completeness
-4. **Integration**: Present for code integration
+### If specific files provided (via @ or paths in prompt):
+1. Read each specified file
+2. Add appropriate inline documentation based on file type
+3. Present summary of changes
+
+### If no files specified:
+1. Identify changed files: `git diff --cached --name-only` and `git diff --name-only`
+2. Read each changed file
+3. Add appropriate inline documentation based on file type
+4. Present summary of changes
 
 ---
 
-## Stage 1: Analysis
+## Documentation Style by Language
 
-1. Run `git diff --cached --name-only` and `git diff --name-only`
-2. Get diffs: `git diff --cached` and `git diff`
-3. Identify documentation patterns:
-   - JSDoc/TSDoc (JS/TS), Docstrings (Python), GoDoc (Go), Javadoc (Java)
-   - Check for README, API docs, doc generation tools
-4. Categorize: New Features, Bug Fixes, Refactoring, Breaking Changes
-5. Create plan, save to `.cursor-doc/plan.txt`
-
----
-
-## Stage 2: Documentation Generation
-
-Create directory: `.cursor-doc/`
-
-For each file:
-1. Read file and get diff
-2. Analyze: public APIs, complex logic, error patterns, dependencies
-3. Generate documentation (see templates below)
-4. Save to `.cursor-doc/[filename].doc.md`
-
-### Templates
-
-**JSDoc/TSDoc:**
+### TypeScript/JavaScript - Use JSDoc/TSDoc
 ```typescript
 /**
- * Brief description.
+ * Brief description of what the function does.
  * 
- * @param {Type} param - Description
- * @returns {Type} Description
- * @throws {Error} When error occurs
+ * @param paramName - Description of parameter
+ * @returns Description of return value
+ * 
  * @example
- * const result = fn(param);
+ * const result = functionName(param);
  */
 ```
 
-**Python:**
+### Python - Use Docstrings
 ```python
-"""Brief description.
+"""Brief description of what the function does.
 
 Args:
-    param: Description
+    param_name: Description of parameter
 
 Returns:
-    Description
+    Description of return value
 
-Raises:
-    Error: When error occurs
-    
 Example:
-    >>> result = fn(param)
+    >>> result = function_name(param)
 """
 ```
 
-**Go:**
+### Go - Use Go Comments
 ```go
-// FunctionName does X.
-// Returns Y or error if Z.
-//
-// Example:
-//   result, err := FunctionName(param)
-```
-
-**README/Feature:**
-```markdown
-# Feature Name
-Brief description
-
-## Usage
-```code
-example
-```
-
-## API
-- `function(param)` - Description
-
-## Configuration
-| Option | Type | Default | Description |
+// FunctionName does X and returns Y.
+// Returns error if Z occurs.
 ```
 
 ---
 
-## Stage 3: Review
+## What to Document
 
-Check:
-- All public APIs documented
-- Parameters/returns explained
-- Examples provided
-- Follows project conventions
+Focus on:
+- **Public functions/methods** - What they do, params, returns
+- **Classes/Components** - Purpose and usage
+- **Complex logic** - Why it's done this way
+- **Non-obvious code** - Clarify intent
 
-Save report to `.cursor-doc/review-report.md`
-
----
-
-## Stage 4: Integration
-
-Present:
-
-```markdown
-# Documentation Complete ✅
-
-## Summary
-Generated docs for **N files** with **M entries**
-
-## Changes
-
-### Inline: `file.ts`
-Add JSDoc before line X:
-```typescript
-[documentation]
-```
-
-### New: `docs/API.md`
-[content]
-
-### Updated: `README.md`
-Add after line X:
-[content]
-
----
-
-## Next Steps
-1. Review documentation
-2. Apply inline comments
-3. Create new files
-4. Update existing docs
-5. Commit: "docs: add documentation for [feature]"
-```
-
-Keep `.cursor-doc/` for reference.
+Skip:
+- Self-explanatory code
+- Getters/setters without logic
+- Trivial utility functions
 
 ---
 
 ## Quality Standards
 
-- Match existing style
-- Be thorough but concise
-- Focus on changed code
-- Provide working examples
-- Never commit automatically
+- Match existing documentation style in the codebase
+- Be concise but clear
+- Add examples for complex functions
+- Explain the "why" not just the "what"
