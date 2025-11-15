@@ -59,6 +59,16 @@ function getGitRemote() {
   }
 }
 
+// Get current git branch
+function getCurrentBranch() {
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+    return branch;
+  } catch (e) {
+    return 'unknown';
+  }
+}
+
 // Detect provider from git remote
 function detectProvider(remote) {
   if (remote.includes('github.com')) {
@@ -123,8 +133,8 @@ function makeRequest(url, headers) {
   });
 }
 
-// Fetch GitHub PR review comments
-async function fetchGitHubComments(owner, repo, prId, token) {
+// Fetch GitHub PR review comments and branch info
+async function fetchGitHubData(owner, repo, prId, token) {
   if (!token) {
     error('Missing GITHUB_TOKEN environment variable. Get one from: https://github.com/settings/tokens');
   }
@@ -136,6 +146,10 @@ async function fetchGitHubComments(owner, repo, prId, token) {
   };
 
   try {
+    // Fetch PR details (includes branch info)
+    const prUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${prId}`;
+    const pr = await makeRequest(prUrl, headers);
+
     // Fetch review comments (inline comments on code)
     const reviewCommentsUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${prId}/comments`;
     const reviewComments = await makeRequest(reviewCommentsUrl, headers);
@@ -175,14 +189,18 @@ async function fetchGitHubComments(owner, repo, prId, token) {
       }
     }
 
-    return comments;
+    return {
+      comments,
+      branch: pr.head.ref,
+      baseBranch: pr.base.ref
+    };
   } catch (e) {
     error(`GitHub API error: ${e.message}`);
   }
 }
 
-// Fetch GitLab MR discussion comments
-async function fetchGitLabComments(group, project, mrId, token) {
+// Fetch GitLab MR discussion comments and branch info
+async function fetchGitLabData(group, project, mrId, token) {
   if (!token) {
     error('Missing GITLAB_TOKEN environment variable. Get one from: GitLab → Settings → Access Tokens');
   }
@@ -195,6 +213,11 @@ async function fetchGitLabComments(group, project, mrId, token) {
   const projectPath = encodeURIComponent(`${group}/${project}`);
 
   try {
+    // Fetch MR details (includes branch info)
+    const mrUrl = `https://gitlab.com/api/v4/projects/${projectPath}/merge_requests/${mrId}`;
+    const mr = await makeRequest(mrUrl, headers);
+
+    // Fetch discussions
     const discussionsUrl = `https://gitlab.com/api/v4/projects/${projectPath}/merge_requests/${mrId}/discussions`;
     const discussions = await makeRequest(discussionsUrl, headers);
 
@@ -217,7 +240,11 @@ async function fetchGitLabComments(group, project, mrId, token) {
       }
     }
 
-    return comments;
+    return {
+      comments,
+      branch: mr.source_branch,
+      baseBranch: mr.target_branch
+    };
   } catch (e) {
     error(`GitLab API error: ${e.message}`);
   }
@@ -231,31 +258,38 @@ async function main() {
   const remote = getGitRemote();
   const provider = parsed.provider || detectProvider(remote);
   const mrId = parsed.id;
+  const currentBranch = getCurrentBranch();
 
-  let comments = [];
+  let data = {};
 
   if (provider === 'github') {
     const { owner, repo } = parseGitHubRemote(remote);
     const token = process.env.GITHUB_TOKEN;
-    comments = await fetchGitHubComments(owner, repo, mrId, token);
+    data = await fetchGitHubData(owner, repo, mrId, token);
   } else if (provider === 'gitlab') {
     const { group, project } = parseGitLabRemote(remote);
     const token = process.env.GITLAB_TOKEN;
-    comments = await fetchGitLabComments(group, project, mrId, token);
+    data = await fetchGitLabData(group, project, mrId, token);
   }
 
   // Filter out comments without file/line (optional: keep them or remove them)
   // For now, we'll keep all comments but mark those without file location
-  const processedComments = comments.map(c => ({
+  const processedComments = data.comments.map(c => ({
     ...c,
     file: c.file || '(general comment)',
     line: c.line || 0
   }));
 
+  const needsCheckout = currentBranch !== data.branch;
+
   output({
     success: true,
     provider: provider,
     mr_id: mrId,
+    branch: data.branch,
+    base_branch: data.baseBranch,
+    current_branch: currentBranch,
+    needs_checkout: needsCheckout,
     comments: processedComments,
     total: processedComments.length
   });
