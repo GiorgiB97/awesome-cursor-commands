@@ -22,6 +22,7 @@ These commands provide a complete development workflow:
 - `/review` - Comprehensive code review of staged/unstaged changes
 - `/branchreview` - Review changes between branches
 - `/fix` - Automated fix agent based on review findings
+- `/fixmr` - Fix unresolved review comments from GitHub/GitLab MRs/PRs
 - `/a11y` - Accessibility audit (WCAG compliance)
 
 **Development:**
@@ -109,6 +110,40 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 /fix high         # Fix blockers + major
 /fix blocker      # Fix only blockers
 ```
+
+---
+
+### `/fixmr [MR_ID_OR_URL]`
+**Fetch and fix unresolved review comments from GitHub PRs and GitLab MRs.**
+
+**Features:** Auto-detects provider, lets you select which comments to fix, creates TODO list, applies fixes systematically
+
+**Setup Required:**
+```bash
+# Set environment variables (one-time setup):
+# GitHub:
+export GITHUB_TOKEN="ghp_your_token_here"
+# GitLab:
+export GITLAB_TOKEN="glpat_your_token_here"
+
+# Get tokens from:
+# GitHub: https://github.com/settings/tokens (scope: repo)
+# GitLab: Settings → Access Tokens (scope: api)
+```
+
+**Examples:**
+```bash
+/fixmr 123                                          # Use MR/PR ID
+/fixmr https://github.com/user/repo/pull/456        # GitHub PR URL
+/fixmr https://gitlab.com/group/proj/-/merge_requests/789  # GitLab MR URL
+```
+
+**Workflow:**
+1. Fetches unresolved review comments
+2. Shows numbered list with file, line, and comment
+3. You select which to fix (e.g., `1,3,5` or `all`)
+4. AI creates TODO list and fixes systematically
+5. Review changes with `git diff`
 
 ---
 
@@ -310,6 +345,32 @@ git commit -m "refactor: improve code quality"
 /clean
 ```
 
+### Workflow 5: Addressing MR/PR Review Comments
+
+```bash
+# 1. Fetch unresolved review comments
+/fixmr 123
+
+# 2. Select which comments to fix (AI will prompt)
+# Example response: 1,3,5 or all
+
+# 3. AI creates TODO list and fixes systematically
+# (automatic after selection)
+
+# 4. Review changes
+git diff
+
+# 5. Test affected functionality
+npm test
+
+# 6. Commit fixes
+git add .
+git commit -m "fix: address review comments"
+
+# 7. Push and reply to review threads
+git push
+```
+
 ---
 
 ## Tips & Best Practices
@@ -324,6 +385,8 @@ git commit -m "refactor: improve code quality"
 - Fix high-severity first: `/fix high` then `/fix low`
 - Review multiple times: before staging, after staging, before push
 - Use `/branchreview` before creating PR
+- Use `/fixmr` to systematically address reviewer comments (saves time)
+- Set up GitHub/GitLab tokens once for seamless MR/PR comment fetching
 
 **Testing:**
 - Run `/tests` after implementing features

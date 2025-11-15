@@ -1,0 +1,8 @@
+{
+  "name": "cursor-mr-helpers",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Helper scripts for Cursor IDE commands",
+  "private": true
+}
+
