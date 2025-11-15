@@ -9,36 +9,50 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
 1. [Overview](#overview)
 2. [Installation](#installation)
 3. [Available Commands](#available-commands)
+   - [/task](#task-task-context) - Complete coding tasks
+   - [/review](#review-extra-prompt-file1-file2-) - Code review
+   - [/branchreview](#branchreview-basebranch) - Branch comparison review
+   - [/fix](#fix-severity) - Automated fix agent
+   - [/fixmr](#fixmr-mr_id_or_url) - Fix MR/PR comments
+   - [/a11y](#a11y-extra-prompt) - Accessibility audit
+   - [/refactor](#refactor-file) - Code quality improvement
+   - [/tests](#tests) - Test generation
+   - [/debug](#debug-explain-issue) - Systematic debugging
+   - [/doc](#doc-extra-prompt-file1-file2-) - Add documentation
+   - [/description](#description-pr-title) - Generate PR descriptions
+   - [/history](#history-question-file1-file2-) - Git history analyzer 🔍
+   - [/clean](#clean) - Cleanup utility
 4. [Workflows](#workflows)
 5. [Tips & Best Practices](#tips--best-practices)
 
 ---
 
-## Overview
+## 📖 Overview
 
 These commands provide a complete development workflow:
 
-**Code Quality:**
+**🔍 Code Quality:**
 - `/review` - Comprehensive code review of staged/unstaged changes
 - `/branchreview` - Review changes between branches
 - `/fix` - Automated fix agent based on review findings
 - `/fixmr` - Fix unresolved review comments from GitHub/GitLab MRs/PRs
 - `/a11y` - Accessibility audit (WCAG compliance)
 
-**Development:**
+**🛠️ Development:**
 - `/task` - Elite software engineer for any coding task
 - `/refactor` - Improve code quality while maintaining functionality
 - `/tests` - Generate comprehensive unit tests
 - `/debug` - Systematic debugging and issue resolution
 
-**Documentation & Tools:**
+**📚 Documentation & Tools:**
 - `/doc` - Add inline documentation directly to files
 - `/description` - Generate PR descriptions from git diff
+- `/history` - AI-powered git history analyzer 🔍
 - `/clean` - Clean up temporary command files
 
 ---
 
-## Installation
+## 📦 Installation
 
 Place command files in: `~/.cursor/commands/`
 
@@ -54,7 +68,7 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 
 ---
 
-## Available Commands
+## 🚀 Available Commands
 
 ### `/task [task context]`
 **Elite software engineer executing any coding task through a 5-phase workflow.**
@@ -236,6 +250,43 @@ export GITLAB_TOKEN="glpat_your_token_here"
 
 ---
 
+### `/history [question] [@file1] [@file2] ...`
+**AI-powered git history analyzer - ask anything about code evolution. 🔍**
+
+**Context modes:**
+- **File context:** `@filename` - analyzes specific file only
+- **Function context:** mention function name - tracks that code block
+- **Feature context:** mention keyword - finds related commits
+- **Current file:** no context - analyzes open file
+- **Global context:** "project"/"codebase" - repository-wide
+
+**Question types:**
+- "Why is X missing?" - Finds when/why code was removed
+- "Who changed this?" - Shows authors and contributions
+- "When was this refactored?" - Identifies major structural changes
+- "What broke X?" - Finds commits that caused issues
+- "How did this evolve?" - Shows complete timeline
+- "What changed after..." - Shows commits after specific time/person
+
+**Examples:**
+```bash
+/history Why is the submit button missing?
+/history Who changed this file after me?
+/history @UserService.js when was this last refactored?
+/history When was authentication added?
+/history What broke the login flow?
+```
+
+**Output includes:**
+- Direct answer to your question
+- Timeline of relevant changes
+- Key commits with details (what/why/impact)
+- Statistics (commits, contributors, dates)
+- Code snippets (before/after)
+- Actionable next steps
+
+---
+
 ### `/clean`
 **Clean up temporary directories created by commands.**
 
@@ -248,7 +299,7 @@ export GITLAB_TOKEN="glpat_your_token_here"
 
 ---
 
-## Workflows
+## 🔄 Workflows
 
 ### Workflow 1: Feature Development
 
@@ -373,7 +424,7 @@ git push
 
 ---
 
-## Tips & Best Practices
+## 💡 Tips & Best Practices
 
 **General:**
 - Always `/review` before committing
@@ -410,7 +461,7 @@ git push
 
 ---
 
-## Command Output Locations
+## 📂 Command Output Locations
 
 | Command | Output Directory | Purpose |
 |---------|-----------------|---------|
@@ -426,4 +477,4 @@ git push
 
 ---
 
-## HAPPY "WORKING"
+## HAPPY VIBE CODING
