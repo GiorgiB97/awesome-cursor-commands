@@ -20,7 +20,7 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/debug](#debug-explain-issue) - Systematic debugging
    - [/doc](#doc-extra-prompt-file1-file2-) - Add documentation
    - [/description](#description-pr-title) - Generate PR descriptions
-   - [/history](#history-question-file1-file2-) - Git history analyzer 🔍
+   - [/history](#history-question-file1-file2-) - Git history analyzer
    - [/clean](#clean) - Cleanup utility
 4. [Workflows](#workflows)
 5. [Tips & Best Practices](#tips--best-practices)
