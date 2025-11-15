@@ -280,10 +280,7 @@ export GITLAB_TOKEN="glpat_your_token_here"
 **Output includes:**
 - Direct answer to your question
 - Timeline of relevant changes
-- Key commits with details (what/why/impact)
-- Statistics (commits, contributors, dates)
-- Code snippets (before/after)
-- Actionable next steps
+- Key commits with details
 
 ---
 
