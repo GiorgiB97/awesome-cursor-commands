@@ -20,6 +20,7 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/debug](#debug-explain-issue) - Systematic debugging
    - [/doc](#doc-extra-prompt-file1-file2-) - Add documentation
    - [/description](#description-pr-title) - Generate PR descriptions
+   - [/codesplit](#codesplit-num_splitsanalyze) - Split changes into logical PRs
    - [/history](#history-question-file1-file2-) - Git history analyzer
    - [/clean](#clean) - Cleanup utility
 4. [Workflows](#workflows)
@@ -47,6 +48,7 @@ These commands provide a complete development workflow:
 **📚 Documentation & Tools:**
 - `/doc` - Add inline documentation directly to files
 - `/description` - Generate PR descriptions from git diff
+- `/codesplit` - Split large changes into logical, reviewable PRs
 - `/history` - AI-powered git history analyzer 🔍
 - `/clean` - Clean up temporary command files
 
@@ -250,6 +252,43 @@ export GITLAB_TOKEN="glpat_your_token_here"
 
 ---
 
+### `/codesplit [num_splits|analyze]`
+**Split large changes into logical, independently reviewable PR stashes.**
+
+**Parameters:** Empty/auto (AI decides) | 2-6 (force count) | analyze (plan only)
+
+**Creates:** Backup safety stash + individual split stashes (no files)
+
+**Features:** Respects dependencies, preserves all changes, no branches/commits created
+
+**Examples:**
+```bash
+/codesplit              # Auto-detect optimal number of splits
+/codesplit 3            # Force exactly 3 splits
+/codesplit analyze      # Show plan without creating stashes
+```
+
+**Workflow:**
+1. Analyzes all staged + unstaged changes
+2. Groups by layer (DB → Backend → Frontend → Tests)
+3. Creates backup stash as safety net (restore point)
+4. Creates individual stashes for each logical split
+5. Provides exact commands to apply each stash as separate PR
+
+**Split strategy:**
+- 2-4 files: 2 splits or no split
+- 5-10 files: 2-3 splits
+- 10-20 files: 3-4 splits
+- 20+ files: 4-6 splits
+
+**Safety feature:** Backup stash (`split:YYYYMMDD:backup:ABCD`) preserves ALL changes. If interrupted, restore with:
+```bash
+git reset --hard HEAD
+git stash apply stash@{0}
+```
+
+---
+
 ### `/history [question] [@file1] [@file2] ...`
 **AI-powered git history analyzer - ask anything about code evolution. 🔍**
 
@@ -419,6 +458,40 @@ git commit -m "fix: address review comments"
 git push
 ```
 
+### Workflow 6: Splitting Large Changes into Multiple PRs
+
+```bash
+# 1. Make all your changes (don't commit yet)
+git add .  # or leave some unstaged
+
+# 2. Analyze the split strategy
+/codesplit analyze
+
+# 3. Create split stashes
+/codesplit  # or /codesplit 3 to force 3 splits
+
+# 4. Apply first split and create PR
+git checkout -b feat/database-schema
+git stash apply stash@{3}  # (example ref from output)
+git add . && git commit -m "feat: add database schema"
+git push origin feat/database-schema
+# Create PR #1
+
+# 5. After PR #1 merges, apply second split
+git checkout main && git pull
+git checkout -b feat/backend-api
+git stash apply stash@{2}
+git add . && git commit -m "feat: add backend API"
+git push origin feat/backend-api
+# Create PR #2
+
+# 6. Continue for remaining splits...
+
+# 7. Clean up stashes after all PRs merged
+git stash list | grep "split:20251119"
+git stash drop stash@{N}  # for each split stash
+```
+
 ---
 
 ## 💡 Tips & Best Practices
@@ -456,6 +529,13 @@ git push
 - Review changes carefully after refactoring
 - `/refactor` preserves exact functionality
 
+**Code Splitting:**
+- Use `/codesplit analyze` first to see the plan
+- Backup stash is your safety net - all changes preserved
+- Follow dependency order (DB → BE → FE → Tests)
+- Apply and merge splits in sequence
+- Clean up stashes after all PRs merged
+
 ---
 
 ## 📂 Command Output Locations
@@ -468,7 +548,7 @@ git push
 | `/refactor` | `.cursor-refactor/` | Refactoring logs |
 | `/tests` | `.cursor-tests/` | Test generation data |
 
-**Note:** `/doc` writes directly into source files (no temp directory)
+**Note:** `/doc` and `/codesplit` don't create temp directories. `/doc` writes directly into source files. `/codesplit` creates git stashes.
 
 **Clean up all:** `/clean`
 
