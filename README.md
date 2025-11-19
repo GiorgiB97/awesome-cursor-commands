@@ -259,7 +259,7 @@ export GITLAB_TOKEN="glpat_your_token_here"
 
 **Creates:** Backup safety stash + individual split stashes (no files)
 
-**Features:** Respects dependencies, preserves all changes, no branches/commits created
+**Features:** Smart split strategy detection, preserves all changes, no branches/commits created
 
 **Examples:**
 ```bash
@@ -270,21 +270,26 @@ export GITLAB_TOKEN="glpat_your_token_here"
 
 **Workflow:**
 1. Analyzes all staged + unstaged changes
-2. Groups by layer (DB → Backend → Frontend → Tests)
+2. Determines optimal split strategy:
+   - **Layer-based**: DB → Backend → Frontend (+ Tests)
+   - **Feature-based**: Core → Extensions → Polish
+   - **Implementation+Tests**: Grouped together when tightly coupled
+   - **Independent**: Parallel-mergeable changes
+   - **Hybrid**: Mix strategies based on specific changes
 3. Creates backup stash as safety net (restore point)
 4. Creates individual stashes for each logical split
 5. Provides exact commands to apply each stash as separate PR
 
 **Split strategy:**
-- 2-4 files: 2 splits or no split
+- 2-4 files: 2 splits or no split (considers coupling)
 - 5-10 files: 2-3 splits
 - 10-20 files: 3-4 splits
 - 20+ files: 4-6 splits
 
-**Safety feature:** Backup stash (`split:YYYYMMDD:backup:ABCD`) preserves ALL changes. If interrupted, restore with:
+**Safety feature:** Backup stash (`split:YYYYMMDD:backup:XXXX`) preserves ALL changes. If interrupted, restore with:
 ```bash
 git reset --hard HEAD
-git stash apply stash@{0}
+git stash apply stash@{N}  # N = backup stash index shown in output
 ```
 
 ---
@@ -532,8 +537,8 @@ git stash drop stash@{N}  # for each split stash
 **Code Splitting:**
 - Use `/codesplit analyze` first to see the plan
 - Backup stash is your safety net - all changes preserved
-- Follow dependency order (DB → BE → FE → Tests)
-- Apply and merge splits in sequence
+- AI determines best split strategy (layer-based, feature-based, hybrid, etc.)
+- Follow dependency order for dependent splits; parallelize independent ones
 - Clean up stashes after all PRs merged
 
 ---
