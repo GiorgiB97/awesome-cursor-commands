@@ -19,6 +19,7 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/tests](#tests) - Test generation
    - [/debug](#debug-explain-issue) - Systematic debugging
    - [/doc](#doc-extra-prompt-file1-file2-) - Add documentation
+   - [/simplify] (#simplify-file1-file2-) - Simplify usages
    - [/description](#description-pr-title) - Generate PR descriptions
    - [/codesplit](#codesplit-num_splitsanalyze) - Logical PR splitter (stash-based)
    - [/history](#history-question-file1-file2-) - Git history analyzer
@@ -38,6 +39,7 @@ These commands provide a complete development workflow:
 - `/fix` - Automated fix agent based on review findings
 - `/fixmr` - Fix unresolved review comments from GitHub/GitLab MRs/PRs
 - `/a11y` - Accessibility audit (WCAG compliance)
+- `/simplify` - Check for duplicates, refactor candidates, docstring verbose-ness and etc
 
 **🛠️ Development:**
 - `/task` - Elite software engineer for any coding task
@@ -233,6 +235,16 @@ export GITLAB_TOKEN="glpat_your_token_here"
 /doc                                 # Document changed files
 /doc Focus on public API             # Document changed with focus
 /doc @src/utils.ts @src/api.ts      # Document specific files
+```
+
+---
+
+### `/simplify [@file1] [@file2] ...`
+**Run usage analysis in files, duplicate search, refactor candidates, general evaluation and report**
+
+**Examples:**
+```bash
+/simplify util.tsx helpers.ts
 ```
 
 ---
@@ -581,6 +593,7 @@ git stash drop stash@{0}  # Finally drop backup
 | `/a11y` | `.cursor-a11y/` | Accessibility audit data |
 | `/refactor` | `.cursor-refactor/` | Refactoring logs |
 | `/tests` | `.cursor-tests/` | Test generation data |
+| `/simplify` | `.cursor-review/` | Functionality usage report |
 
 **Note:** `/doc` and `/codesplit` don't create temp directories. `/doc` writes directly into source files. `/codesplit` creates git stashes.
 
