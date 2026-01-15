@@ -155,8 +155,6 @@ Reviewed **N files** with **M findings**
 All findings: `.cursor-review/findings.optimized.jsonl`
 ```
 
-Cleanup: Delete `plan.txt`, keep findings and summary
-
 ---
 
 ## Notes

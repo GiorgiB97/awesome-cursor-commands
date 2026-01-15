@@ -89,8 +89,6 @@ Reviewed **N files** between **[current]** and **[base]** with **M findings**
 All findings: `.cursor-review/findings.optimized.jsonl`
 ```
 
-Cleanup: Delete `plan.txt`, keep findings
-
 ---
 
 ## Notes
