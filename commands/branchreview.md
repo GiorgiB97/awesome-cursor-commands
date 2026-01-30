@@ -51,6 +51,35 @@ Follow identical process as `/review` command for:
 
 Use `.cursor-review/` directory for all outputs.
 
+### Severity (same as /review)
+
+**blocker**: Critical bugs, security, breaking changes preventing merge  
+**major**: Significant issues to fix before merge (bad logic, arch violations)  
+**minor**: Improvements worth addressing (readability, small refactors)  
+**nit**: Polish and style (naming, formatting preferences)
+
+### Comment Labels
+
+**Every finding message MUST start with one of these labels** (format: `label: description`):
+
+- **praise:** Highlights something positive. Try to leave at least one per review. Do not leave false praise. Look for something to sincerely praise.
+- **nitpick:** Trivial preference-based requests. Non-blocking by nature.
+- **suggestion:** Proposes improvements. Be explicit and clear on what is being suggested and why it is an improvement.
+- **issue:** Highlights specific problems (user-facing or behind the scenes). Strongly recommended to pair with a suggestion. If unsure, consider a question instead.
+- **todo:** Small, trivial, but necessary changes. Distinguishes from issues/suggestions to direct attention appropriately.
+- **question:** Use when you have a potential concern but aren't sure if it's relevant. Asking for clarification can lead to quick resolution.
+- **thought:** An idea that popped up from reviewing. Non-blocking, but valuable for mentoring and focused initiatives.
+- **chore:** Simple tasks that must be done before acceptance. Usually references a common process; include a link if applicable.
+- **note:** Always non-blocking. Simply highlights something the reader should take note of.
+
+**Label selection guidance:**
+- Use `issue:` or `suggestion:` for blocker/major severity
+- Use `nitpick:` for nit severity (by definition)
+- Use `todo:` or `chore:` for minor required changes
+- Use `praise:` at least once per review when genuinely warranted
+- Use `question:` when uncertain rather than making assumptions
+- Use `thought:` or `note:` for non-blocking observations
+
 ---
 
 ## Report Format
