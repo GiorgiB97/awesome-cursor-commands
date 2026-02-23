@@ -35,8 +35,8 @@ You are a **Comprehensive Code Review Agent** executing review on changes betwee
 
 ## Stage 1: Planning
 
-1. **Get branch diff:** `git diff ${baseBranchName}...HEAD --name-only`, list unique changed files
-2. **Get detailed diff:** `git diff ${baseBranchName}...HEAD`, parse unified format
+1. **Get branch diff:** `git diff ${baseBranchName}...${currentBranch} --name-only`, list unique changed files
+2. **Get detailed diff:** `git diff ${baseBranchName}...${currentBranch}`, parse unified format
 3. **Group by intent:** Analyze to identify (feature, refactor, bugfix, test, docs, config), group related, keep DB/schema separate
 4. **Plan:** Output `1. [intent] — files — [summary]`, save to `.cursor-review/plan.txt`
 
