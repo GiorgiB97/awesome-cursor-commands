@@ -1,26 +1,34 @@
-# /humanize [level] [--notypo] --- Rewrite AI-generated code and text to feel human-written
+# /humanize [level] [--notypo] [@file1 @file2 ...] --- Rewrite AI-generated code and text to feel human-written
 
 ## Parameters
 
-- **[level]** (optional): How aggressively to humanize the diff. Default: `medium`
+- **[level]** (optional): How aggressively to humanize. Default: `medium`
   - `low`: Minimal changes, 0-1 typos/grammar mistakes
   - `medium`: Moderate rewriting, 0-2 typos/grammar mistakes
   - `high`: Heavy rewriting, 0-3 typos/grammar mistakes
 - **--notypo** (optional): Disable all typos and grammar mistakes. Still rewrites text to sound more natural.
+- **@file1, @file2, ...** (optional): Specific files to humanize. When provided, humanize the entire content of these files instead of the git diff. Use @ notation or raw paths.
+
+### Input Mode
+
+The command operates in one of two modes depending on whether files are attached:
+
+- **Diff mode** (default, no files attached): Reads `git diff` (staged + unstaged) and humanizes only the changed lines.
+- **File mode** (files attached): Reads the full content of each attached file and humanizes the entire file, ignoring the git diff.
 
 ---
 
-You are a **Human Voice Rewriter** that takes AI-generated code and text from the current git diff and rewrites it to read like a real person wrote it.
+You are a **Human Voice Rewriter** that takes AI-generated code and text and rewrites it to read like a real person wrote it. When specific files are provided, humanize those files in full. Otherwise, operate on the current git diff.
 
-**RULES:** Never break functionality, never change code logic, never alter imports/exports/types/interfaces, only rewrite within the diff, preserve all test assertions, keep every API contract intact
+**RULES:** Never break functionality, never change code logic, never alter imports/exports/types/interfaces, preserve all test assertions, keep every API contract intact
 
 ---
 
 ## Workflow
 
-1. **Collect Diff**: Gather all staged and unstaged changes
+1. **Collect Input**: Gather target content (diff or specific files)
 2. **Classify Content**: Separate code from comments/strings/docs
-3. **Detect AI Patterns**: Find AI-typical markers in the diff
+3. **Detect AI Patterns**: Find AI-typical markers
 4. **Rewrite**: Apply humanization based on level
 5. **Inject Imperfections**: Add controlled typos if enabled
 6. **Verify**: Confirm no functionality was broken
@@ -28,7 +36,16 @@ You are a **Human Voice Rewriter** that takes AI-generated code and text from th
 
 ---
 
-## Stage 1: Collect Diff
+## Stage 1: Collect Input
+
+### If files are attached (File mode)
+
+1. Read the full content of each attached file
+2. If a file does not exist or is unreadable: warn and skip it
+3. If no valid files remain: output "No valid files to humanize." and stop
+4. Treat **every line** in these files as a candidate for humanization (not just changed lines)
+
+### If no files are attached (Diff mode)
 
 1. Run `git diff` to get unstaged changes
 2. Run `git diff --cached` to get staged changes
@@ -40,7 +57,7 @@ You are a **Human Voice Rewriter** that takes AI-generated code and text from th
 
 ## Stage 2: Classify Content
 
-For each changed line, classify as one of:
+For each target line (changed lines in Diff mode, all lines in File mode), classify as one of:
 
 | Type | Description | Humanize? | Typo-safe? |
 |------|-------------|-----------|------------|
@@ -60,7 +77,7 @@ For each changed line, classify as one of:
 
 ## Stage 3: Detect AI Patterns
 
-Scan every changed line for these AI fingerprints:
+Scan every target line for these AI fingerprints:
 
 ### Characters to Remove/Replace
 
@@ -175,9 +192,9 @@ Typos and grammar mistakes make text feel genuinely human. Apply only to **typo-
 
 | Level | Budget |
 |-------|--------|
-| Low | 0-1 total across entire diff |
-| Medium | 0-2 total across entire diff |
-| High | 0-3 total across entire diff |
+| Low | 0-1 total across entire input |
+| Medium | 0-2 total across entire input |
+| High | 0-3 total across entire input |
 
 ### Allowed Typo Types
 
@@ -233,6 +250,7 @@ If any check fails, revert that specific change and proceed with the rest.
 ## Settings
 **Level**: [low/medium/high]
 **Typos**: [enabled/disabled]
+**Mode**: [diff/file]
 
 ## Summary
 Processed **N files**, rewrote **M lines**
@@ -311,6 +329,8 @@ All changes verified: no logic altered, no functionality broken.
 - **Files with no AI patterns**: Report "already looks human" and skip
 - **Conflicts between rename and functionality**: Preserve functionality, skip the rename
 - **Large diffs (>1000 lines)**: Process in batches, report progress
+- **File mode with large files**: Process the full file but apply the same safety rules; be extra careful with variable renames since the scope is the entire file, not just a diff hunk
+- **Mixed input (files + diff)**: If files are attached, ignore the diff entirely and only process the attached files
 
 ---
 
