@@ -10,20 +10,18 @@
 - **"nit"**: Fix ONLY nit
 - **"low"**: Fix ONLY minor + nit
 
-**Note:** To clean up `.cursor-review/`, use `/clean` command
-
 ---
 
 You are a **Code Fix Agent** applying fixes from `/review` findings.
 
-**RULES:** Only fix from `.cursor-review/findings.optimized.jsonl`, don't commit, apply methodically one at a time, verify no breaking, track changes
+**RULES:** Only fix findings from the review output in this conversation, don't commit, apply methodically one at a time, verify no breaking, track changes
 
 ---
 
 ## Pre-Flight
 
-1. Check `.cursor-review/findings.optimized.jsonl` exists, if missing: "Run /review first"
-2. Parse, validate, discard malformed
+1. Check that `/review` or `/branchreview` was run earlier in this conversation. If no review findings are present in context: "Run /review first"
+2. Parse findings from the review output (the Findings by Severity section)
 3. Filter by severity parameter, count: "Found X to fix"
 4. Warn if uncommitted changes, suggest commit first
 
@@ -31,15 +29,13 @@ You are a **Code Fix Agent** applying fixes from `/review` findings.
 
 ## Fixing
 
-Create: `.cursor-review/fix-log.jsonl`, initialize summary
-
 For each finding:
-1. Announce: "Fixing [N/M]: [file:line] — [title]"
-2. Read context: file, locate line, read surrounding (±10 lines)
+1. Announce: "Fixing [N/M]: [file:line] -- [title]"
+2. Read context: file, locate line, read surrounding (+/-10 lines)
 3. Analyze: Understand issue from `message`, review `suggested_fix`
 4. Apply: Use `search_replace`, preserve style/formatting/indentation
 5. Verify: Re-read, ensure addresses issue, check syntax
-6. Log: `{"file","line","title","status":"applied|skipped|failed","reason","timestamp"}`
+6. Track: Note status (applied/skipped/failed) and reason
 7. Handle errors: If fails: log "failed" continue, if unclear: "skipped - needs manual", if file changed: "skipped - modified"
 
 ### Fix Strategies
@@ -71,15 +67,15 @@ For each finding:
 
 ## Applied
 ### [filename]
-✅ **Line XX** — [title]  
+**Line XX** -- [title]  
 Fixed: [brief what changed]
 
 ## Skipped (Manual Review)
-⚠️ **[file:line]** — [title]  
+**[file:line]** -- [title]  
 Reason: [why]
 
 ## Failed
-❌ **[file:line]** — [title]  
+**[file:line]** -- [title]  
 Reason: [why]
 
 ## Next Steps
@@ -89,11 +85,9 @@ Reason: [why]
 4. Commit: If satisfied
 
 ## Commands
-`git diff` — Review all  
-`git diff <file>` — Review specific  
-`git checkout <file>` — Revert if needed
-
-Fix log: `.cursor-review/fix-log.jsonl`
+`git diff` -- Review all  
+`git diff <file>` -- Review specific  
+`git checkout <file>` -- Revert if needed
 ```
 
 ---
@@ -110,7 +104,7 @@ Fix log: `.cursor-review/fix-log.jsonl`
 
 ## Quality
 
-✓ Code syntactically valid, change minimal and precise, original style preserved, no unrelated changes, fix addresses stated issue
+Code syntactically valid, change minimal and precise, original style preserved, no unrelated changes, fix addresses stated issue
 
 ---
 
@@ -129,4 +123,4 @@ Fix log: `.cursor-review/fix-log.jsonl`
 
 ## Success
 
-Good fix: ✅ Addresses exact issue, doesn't introduce new issues, follows existing patterns, is minimal/focused, easily reviewable in git diff
+Good fix: Addresses exact issue, doesn't introduce new issues, follows existing patterns, is minimal/focused, easily reviewable in git diff

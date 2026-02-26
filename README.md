@@ -23,7 +23,6 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/description](#description-pr-title) - Generate PR descriptions
    - [/codesplit](#codesplit-num_splitsanalyze) - Logical PR splitter (stash-based)
    - [/history](#history-question-file1-file2-) - Git history analyzer
-   - [/clean](#clean) - Cleanup utility
    - [/generatecommand](#generatecommand-description) - Generate new commands
 4. [Workflows](#workflows)
 5. [Tips & Best Practices](#tips--best-practices)
@@ -53,7 +52,6 @@ These commands provide a complete development workflow:
 - `/description` - Generate PR descriptions from git diff
 - `/codesplit` - Logical PR splitter (stash-based, dependency-aware)
 - `/history` - AI-powered git history analyzer 🔍
-- `/clean` - Clean up temporary command files
 - `/generatecommand` - Generate new commands matching this format
 
 ---
@@ -91,13 +89,13 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 ---
 
 ### `/review [extra prompt] [@file1] [@file2] ...`
-**Comprehensive code review with JSONL findings.**
+**Comprehensive code review with structured findings.**
 
 **Target:** Changed files (default) OR specific files with @ notation
 
 **Severity:** 🔴 blocker | 🟠 major | 🟡 minor | 🔵 nit
 
-**Output:** `.cursor-review/findings.optimized.jsonl`
+**Output:** Findings presented directly in conversation (no files created)
 
 **Examples:**
 ```bash
@@ -359,18 +357,6 @@ git stash apply stash@{N}  # N = backup stash index from output
 
 ---
 
-### `/clean`
-**Clean up temporary directories created by commands.**
-
-**Removes:** `.cursor-review/`, `.cursor-a11y/`, `.cursor-refactor/`, `.cursor-tests/`
-
-**Example:**
-```bash
-/clean            # Remove all temporary directories
-```
-
----
-
 ### `/generatecommand [description]`
 **Generate a new Cursor command following the established format and structure.**
 
@@ -413,8 +399,7 @@ git stash apply stash@{N}  # N = backup stash index from output
 # 7. Create PR description
 /description JIRA-123 Add authentication
 
-# 8. Clean up and commit
-/clean
+# 8. Commit
 git add .
 git commit -m "feat: add JWT authentication"
 ```
@@ -438,7 +423,6 @@ git commit -m "feat: add JWT authentication"
 /fix
 
 # 6. Commit
-/clean
 git commit -m "fix: prevent double form submission"
 ```
 
@@ -461,7 +445,6 @@ git commit -m "fix: prevent double form submission"
 /doc
 
 # 6. Commit
-/clean
 git commit -m "refactor: improve code quality"
 ```
 
@@ -479,9 +462,6 @@ git commit -m "refactor: improve code quality"
 
 # 4. Generate PR description
 /description JIRA-123 Feature description
-
-# 5. Clean up
-/clean
 ```
 
 ### Workflow 5: Addressing MR/PR Review Comments
@@ -559,7 +539,6 @@ git stash drop stash@{0}  # Finally drop backup
 
 **General:**
 - Always `/review` before committing
-- Use `/clean` when done to free up space
 - Create `.cursorrules` or `AGENT.md` for project-specific patterns
 - Break large tasks into smaller ones
 
@@ -602,20 +581,17 @@ git stash drop stash@{0}  # Finally drop backup
 
 ---
 
-## 📂 Command Output Locations
+## 📂 Command Output
 
-| Command | Output Directory | Purpose |
-|---------|-----------------|---------|
-| `/review` | `.cursor-review/` | Review findings (JSONL) |
-| `/branchreview` | `.cursor-review/` | Branch review findings |
+| Command | Output | Notes |
+|---------|--------|-------|
+| `/review` | Conversation context | No files created |
+| `/branchreview` | Conversation context | No files created |
+| `/fix` | Applies fixes to source files | Reads findings from `/review` output in same conversation |
 | `/a11y` | `.cursor-a11y/` | Accessibility audit data |
-| `/refactor` | `.cursor-refactor/` | Refactoring logs |
-| `/tests` | `.cursor-tests/` | Test generation data |
-| `/simplify` | `.cursor-review/` | Functionality usage report |
-
-**Note:** `/doc` and `/codesplit` don't create temp directories. `/doc` writes directly into source files. `/codesplit` creates git stashes.
-
-**Clean up all:** `/clean`
+| `/simplify` | `{filename}-simplify-checklist.json` | Checklist in project root |
+| `/doc` | Source files | Writes documentation directly into code |
+| `/codesplit` | Git stashes | No files created |
 
 ---
 
