@@ -19,7 +19,7 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/tests](#tests) - Test generation
    - [/debug](#debug-explain-issue) - Systematic debugging
    - [/doc](#doc-extra-prompt-file1-file2-) - Add documentation
-   - [/simplify] (#simplify-file1-file2-) - Simplify usages
+   - [/simplify](#simplify-file1-file2-) - Simplify usages
    - [/description](#description-pr-title) - Generate PR descriptions
    - [/codesplit](#codesplit-num_splitsanalyze) - Logical PR splitter (stash-based)
    - [/history](#history-question-file1-file2-) - Git history analyzer
