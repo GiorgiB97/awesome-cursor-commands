@@ -581,18 +581,4 @@ git stash drop stash@{0}  # Finally drop backup
 
 ---
 
-## 📂 Command Output
-
-| Command | Output | Notes |
-|---------|--------|-------|
-| `/review` | Conversation context | No files created |
-| `/branchreview` | Conversation context | No files created |
-| `/fix` | Applies fixes to source files | Reads findings from `/review` output in same conversation |
-| `/a11y` | `.cursor-a11y/` | Accessibility audit data |
-| `/simplify` | `{filename}-simplify-checklist.json` | Checklist in project root |
-| `/doc` | Source files | Writes documentation directly into code |
-| `/codesplit` | Git stashes | No files created |
-
----
-
 ## HAPPY VIBE CODING
