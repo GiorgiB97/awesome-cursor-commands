@@ -24,7 +24,6 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/codesplit](#codesplit-num_splitsanalyze) - Logical PR splitter (stash-based)
    - [/history](#history-question-file1-file2-) - Git history analyzer
    - [/generatecommand](#generatecommand-description) - Generate new commands
-   - [/worktree](#worktree-create-name-branch--use-name-branch--list--remove-name) - Manage Apollo git worktrees
 4. [Workflows](#workflows)
 5. [Tips & Best Practices](#tips--best-practices)
 
@@ -54,9 +53,6 @@ These commands provide a complete development workflow:
 - `/codesplit` - Logical PR splitter (stash-based, dependency-aware)
 - `/history` - AI-powered git history analyzer 🔍
 - `/generatecommand` - Generate new commands matching this format
-
-**🌳 Infrastructure:**
-- `/worktree` - Manage Apollo git worktrees (create, use, list, remove)
 
 ---
 
@@ -373,31 +369,6 @@ git stash apply stash@{N}  # N = backup stash index from output
 /generatecommand Create a command that runs security scans on changed files
 /generatecommand A command to generate changelog entries from git commits
 /generatecommand Command that checks for unused dependencies in the project
-```
-
----
-
-### `/worktree [create <name> [branch] | use <name> [branch] | list | remove <name>]`
-**Manage Apollo git worktrees - create isolated working directories, switch context, and clean up.**
-
-**Convention:** `<name>` maps to path `/Users/milad/nevoya/apollo-wt-<name>`
-
-**Subcommands:**
-
-- **`create <name>`** - New worktree + branch `feature/md/<name>` off `main`, installs backend (poetry) and frontend (pnpm) deps, copies `.env` files
-- **`create <name> <branch>`** - New worktree checking out an existing branch, full setup
-- **`use <name>`** - Set worktree as working context for the conversation
-- **`use <name> <branch>`** - Checkout branch in worktree, then set context
-- **`list`** - Show all worktrees in a formatted table
-- **`remove <name>`** - Remove a worktree (prompts for `--force` if dirty)
-
-**Examples:**
-```bash
-/worktree create auth-flow                    # New worktree on feature/md/auth-flow
-/worktree create hotfix fix/login-redirect    # New worktree on existing branch
-/worktree use auth-flow                       # Switch context to auth-flow worktree
-/worktree list                                # Show all worktrees
-/worktree remove auth-flow                    # Clean up worktree
 ```
 
 ---
