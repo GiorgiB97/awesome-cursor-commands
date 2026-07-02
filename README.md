@@ -12,6 +12,7 @@ Comprehensive custom commands for Cursor IDE that transform it into a powerful d
    - [/task](#task-task-context) - Complete coding tasks
    - [/review](#review-extra-prompt-file1-file2-) - Code review
    - [/branchreview](#branchreview-basebranch) - Branch comparison review
+   - [/stackreview](#stackreview-extra-prompt-file1-file2-) - Uncommitted review with stack context
    - [/fix](#fix-severity) - Automated fix agent
    - [/fixmr](#fixmr-mr_id_or_url) - Fix MR/PR comments
    - [/a11y](#a11y-extra-prompt) - Accessibility audit
@@ -36,6 +37,7 @@ These commands provide a complete development workflow:
 **🔍 Code Quality:**
 - `/review` - Comprehensive code review of staged/unstaged changes
 - `/branchreview` - Review changes between branches
+- `/stackreview` - Review uncommitted changes with branch stack context
 - `/fix` - Automated fix agent based on review findings
 - `/fixmr` - Fix unresolved review comments from GitHub/GitLab MRs/PRs
 - `/a11y` - Accessibility audit (WCAG compliance)
@@ -113,6 +115,26 @@ cp -r awesome-cursor-commands/commands/* ~/.cursor/commands/
 ```bash
 /branchreview           # Compare against dev
 /branchreview main      # Compare against main
+```
+
+---
+
+### `/stackreview [extra prompt] [@file1] [@file2] ...`
+**Review uncommitted changes with stack context from the current branch vs default base.**
+
+**Target:** Uncommitted changes (staged + unstaged) OR specific files with @ notation
+
+**Context:** Branch diff vs `dev`/`master`/`main` for intent and stack fit (findings are based on uncommitted diff only)
+
+**Severity:** 🔴 blocker | 🟠 major | 🟡 minor | 🔵 nit
+
+**Output:** Findings presented directly in conversation (no files created)
+
+**Examples:**
+```bash
+/stackreview                              # Review uncommitted with stack context
+/stackreview Focus on security issues     # Review with focus
+/stackreview @src/auth.ts @src/user.ts   # Review specific files
 ```
 
 ---
